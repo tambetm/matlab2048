@@ -1,0 +1,3 @@
+[submodule "DeepLearnToolbox"]
+	path = DeepLearnToolbox
+	url = git@github.com:rasmusbergpalm/DeepLearnToolbox.git
