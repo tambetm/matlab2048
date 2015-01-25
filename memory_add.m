@@ -1,4 +1,4 @@
-function m = memory_add(m, prestate, action, reward, poststate)
+function memory_add(prestate, action, reward, poststate)
 % MEMORY_ADD Add one state transition to memory.
 % Parameters:
 %  m - memory object
@@ -8,6 +8,7 @@ function m = memory_add(m, prestate, action, reward, poststate)
 %  poststate - state after the action
 % Returns new memory object.
 
+    global m;
     % roll over to first if over limit
     m.size = m.size + 1;
     index = mod(m.size - 1, m.limit) + 1;

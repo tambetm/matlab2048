@@ -1,4 +1,4 @@
-function batch = memory_minibatch(m, minibatch_size)
+function batch = memory_minibatch(minibatch_size)
 % MEMORY_MINIBATCH Return minibatch from memory.
 % Parameters:
 %  m - memory object
@@ -6,6 +6,7 @@ function batch = memory_minibatch(m, minibatch_size)
 % Returns minibatch struct, containing four matrices: prestates, actions,
 % rewards and poststates.
 
+    global m;
     % find minibatch_size random indexes of memory
     indexes = randperm(min(m.size, m.limit), minibatch_size);
     % return values of those cells

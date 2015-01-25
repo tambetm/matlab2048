@@ -19,7 +19,7 @@ function results = agent_nn(nr_games, exploration_rate, discount_rate, learning_
     global m;
     global nn;
     if isempty(m)
-        m = memory_init(1000000, [4 4]);
+        memory_init(1000000, [4 4]);
     end
     % initialize neural network, if it hasn't been initialized yet
     if isempty(nn)
@@ -66,15 +66,16 @@ function results = agent_nn(nr_games, exploration_rate, discount_rate, learning_
             end
             
             % add state transition to memory
-            m = memory_add(m, a, action, points, b);
+            memory_add(a, action, points, b);
             a = b;
 
             % if memory contain enough states
             if m.size > minibatch_size
                 % get minibatch from memory and train network
-                b = memory_minibatch(m, minibatch_size);
+                b = memory_minibatch(minibatch_size);
                 nn = agent_nn_train(nn, b, discount_rate);
             end
         end
+        disp([i results(i)]);
     end
 end
