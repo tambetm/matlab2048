@@ -9,7 +9,7 @@ cd matlab2048
 git submodule init
 git submodule update
 ```
-Last three lines are required to download [DeepLearnToolbox](https://github.com/rasmusbergpalm/DeepLearnToolbox).
+Last two lines are required to download [DeepLearnToolbox](https://github.com/rasmusbergpalm/DeepLearnToolbox). (Broken at the moment. Use `git clone git@github.com:rasmusbergpalm/DeepLearnToolbox.git` until I figure it out.)
 
 How to run it:
 ```
