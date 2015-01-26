@@ -8,7 +8,7 @@ classdef RandomAgent < handle
         action_labels = {'UP', 'RIGHT', 'DOWN', 'LEFT'};
     end
 
-    properties (Access=protected)
+    properties
         game;
     end
     

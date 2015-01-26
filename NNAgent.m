@@ -14,9 +14,7 @@ classdef NNAgent < handle
         exploration_rate;
         discount_rate;
         minibatch_size;
-    end
-    
-    properties (Access=protected)
+
         mem;
         nnet;
         game;
@@ -24,6 +22,8 @@ classdef NNAgent < handle
 
     methods
         function this = NNAgent(exploration_rate, discount_rate, learning_rate, momentum, layers, minibatch_size)
+        % NNAGENT Creates deep Q-learning agent.
+        % Parameters:
         %  exporation_rate - choose random move with this probability, i.e. 0.05.
         %  discount_rate - discount future rewards by this coefficient, i.e. 0.9.
         %  learning_rate - learning rate of neural network, i.e. 0.01.
@@ -43,7 +43,7 @@ classdef NNAgent < handle
             this.nnet = nnsetup([this.rows*this.cols layers this.actions]);
             this.nnet.output = 'linear';
             this.nnet.momentum = momentum;
-            this.nnet.activation_function = 'sigm';
+            this.nnet.activation_function = 'tanh_opt';
             this.nnet.learningRate = learning_rate;
             
             % initialize game
@@ -55,11 +55,9 @@ classdef NNAgent < handle
         % Parameters:
         %  nr_games - number of games to play. If 1, then also displays debug info.
         % Returns scores in those games as a vector.
-        % Neural network and memory are retained for next invocations as global
-        % variables. So you can call this function several times and it continues 
-        % improving the same network, but learning_rate, momentum and layers take 
-        % effect only on first time. If you want to clear neural network and 
-        % memory, issue clear all command.
+        % You can call this function several times and it continues 
+        % improving the same network, but learning_rate, momentum and 
+        % layers take effect only on first time. 
 
             % play nr_games
             for i = (1:nr_games)
@@ -90,7 +88,7 @@ classdef NNAgent < handle
 
                     % make a move and observe reward
                     a = this.game.state;
-                    points = this.game.move(action);
+                    [points, changed] = this.game.move(action);
                     b = this.game.state;
                     results(i) = results(i) + points;
                     if (nr_games == 1)
@@ -98,8 +96,10 @@ classdef NNAgent < handle
                         disp(b);
                     end
 
-                    % add state transition to memory
-                    this.mem.add(a, action, points, b);
+                    % add state transition to memory only if changed
+                    if changed
+                        this.mem.add(a, action, points, b);
+                    end
 
                     % if memory contain enough states
                     if this.mem.size > this.minibatch_size
@@ -116,9 +116,8 @@ classdef NNAgent < handle
         % Parameters:
         %  a - game state
         % Returns predicted Q-values.
-
             % flatten the matrix and turn into one-element minibatch
-            x = a(:)';
+            x = max(log2(a(:)'), 0);
             % copied from nnpredict()
             this.nnet.testing = 1;
             this.nnet = nnff(this.nnet, x, zeros(size(x,1), this.nnet.size(end)));
@@ -133,8 +132,8 @@ classdef NNAgent < handle
         % Returns trained neural network.
 
             % flatten states for input to neural network
-            x = b.prestates(:,:);
-            xx = b.poststates(:,:);
+            x = max(log2(b.prestates(:,:)), 0);
+            xx = max(log2(b.poststates(:,:)), 0);
 
             % predict Q-values of prestates
             this.nnet.testing = 1;

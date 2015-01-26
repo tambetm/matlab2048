@@ -10,7 +10,7 @@ classdef Memory < handle
     
     methods
         function this = Memory(limit, dims)
-        % Memory Initialize memory.
+        % MEMORY Initialize memory.
         % Parameters:
         %  limit - memory maximum size
         %  dims - dimensions of states, e.g. [4 4]
@@ -47,7 +47,7 @@ classdef Memory < handle
         end
 
         function batch = minibatch(this, minibatch_size)
-        % MEMORY_MINIBATCH Return minibatch from memory.
+        % MINIBATCH Return minibatch from memory.
         % Parameters:
         %  m - memory object
         %  minibatch_size - size of the minibatch
