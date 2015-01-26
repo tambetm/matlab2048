@@ -43,7 +43,7 @@ classdef NNAgent < handle
             this.nnet = nnsetup([this.rows*this.cols layers this.actions]);
             this.nnet.output = 'linear';
             this.nnet.momentum = momentum;
-            this.nnet.activation_function = 'tanh_opt';
+            this.nnet.activation_function = 'sigm';
             this.nnet.learningRate = learning_rate;
             
             % initialize game
@@ -117,7 +117,7 @@ classdef NNAgent < handle
         %  a - game state
         % Returns predicted Q-values.
             % flatten the matrix and turn into one-element minibatch
-            x = max(log2(a(:)'), 0);
+            x = a(:)';
             % copied from nnpredict()
             this.nnet.testing = 1;
             this.nnet = nnff(this.nnet, x, zeros(size(x,1), this.nnet.size(end)));
@@ -132,8 +132,8 @@ classdef NNAgent < handle
         % Returns trained neural network.
 
             % flatten states for input to neural network
-            x = max(log2(b.prestates(:,:)), 0);
-            xx = max(log2(b.poststates(:,:)), 0);
+            x = b.prestates(:,:);
+            xx = b.poststates(:,:);
 
             % predict Q-values of prestates
             this.nnet.testing = 1;
