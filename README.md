@@ -2,13 +2,26 @@
 
 An agent playing game [2048](http://gabrielecirulli.github.io/2048/) using deep Q-learning in Matlab.
 
+How to download the code:
 ```
+git clone git@github.com:tambetm/matlab2048.git
+cd matlab2048
+git submodule init
+git submodule update
+```
+Last two lines are required to download [DeepLearnToolbox](https://github.com/rasmusbergpalm/DeepLearnToolbox). (Broken at the moment. Use `git clone git@github.com:rasmusbergpalm/DeepLearnToolbox.git` until I figure it out.)
+
+How to run it:
+```
+clear all;
+rng('shuffle');
+
 % Add DeepLearnToolbox to path
 addpath(genpath('DeepLearnToolbox'));
 
 % How many games to play
 n = 100;
-% How many games average
+% Number of groups for averaging
 k = 10;
 
 % Creates new agent with 
@@ -27,7 +40,9 @@ b = RandomAgent();
 results_random = b.play(n);
 
 % Plot results.
-plot(mean(reshape([results_nn; results_random], 2, n/k, k), 3)');
+figure;
+results = reshape([results_nn; results_random], 2, k, n/k);
+errorbar(mean(results, 3)', std(results, 0, 3)');
 legend('NNAgent', 'RandomAgent');
 ```
 
