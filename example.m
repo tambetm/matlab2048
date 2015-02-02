@@ -15,8 +15,12 @@ k = 10;
 %  - learning rate 0.01, 
 %  - momentum 0, 
 %  - two layers 256 units each,
+%  - no preprocessing
+%  - sigmoidal activation function
+%  - no dropout
+%  - no weight decay
 %  - minibatch size 32.
-a = NNAgent(0.05, 0.9, 0.01, 0, [256 256], 32);
+a = NNAgent(0.05, 0.9, 0.01, 0, [256 256], @(x) x, 'sigm', 0, 0, 32);
 % Plays n games
 results_nn = a.play(n);
 

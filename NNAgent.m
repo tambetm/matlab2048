@@ -14,6 +14,7 @@ classdef NNAgent < handle
         exploration_rate;
         discount_rate;
         minibatch_size;
+        preprocess;
 
         mem;
         nnet;
@@ -21,7 +22,10 @@ classdef NNAgent < handle
     end
 
     methods
-        function this = NNAgent(exploration_rate, discount_rate, learning_rate, momentum, layers, minibatch_size)
+        function this = NNAgent(exploration_rate, discount_rate, ...
+                learning_rate, momentum, layers, preprocess_function, ...
+                activation_function, dropout_fraction, weight_penalty, ...
+                minibatch_size)
         % NNAGENT Creates deep Q-learning agent.
         % Parameters:
         %  exporation_rate - choose random move with this probability, i.e. 0.05.
@@ -35,6 +39,7 @@ classdef NNAgent < handle
             this.exploration_rate = exploration_rate;
             this.discount_rate = discount_rate;
             this.minibatch_size = minibatch_size;
+            this.preprocess = preprocess_function;
 
             % initialize memory
             this.mem = Memory(this.memory_size, [this.rows this.cols]);
@@ -43,7 +48,9 @@ classdef NNAgent < handle
             this.nnet = nnsetup([this.rows*this.cols layers this.actions]);
             this.nnet.output = 'linear';
             this.nnet.momentum = momentum;
-            this.nnet.activation_function = 'sigm';
+            this.nnet.activation_function = activation_function;
+            this.nnet.dropoutFraction = dropout_fraction;
+            this.nnet.weightPenaltyL2 = weight_penalty;
             this.nnet.learningRate = learning_rate;
             
             % initialize game
@@ -79,7 +86,7 @@ classdef NNAgent < handle
                     else
                         % choose action with the best Q-value
                         qvalues = this.predict(this.game.state);
-                        [dummy, action] = max(qvalues, [], 2);
+                        [~, action] = max(qvalues, [], 2);
                         if (nr_games == 1)
                             disp(['Q-values: ' num2str(qvalues)]);
                             disp([this.action_labels{action} '(predicted)'])
@@ -117,7 +124,7 @@ classdef NNAgent < handle
         %  a - game state
         % Returns predicted Q-values.
             % flatten the matrix and turn into one-element minibatch
-            x = a(:)';
+            x = this.preprocess(a(:)');
             % copied from nnpredict()
             this.nnet.testing = 1;
             this.nnet = nnff(this.nnet, x, zeros(size(x,1), this.nnet.size(end)));
@@ -132,8 +139,8 @@ classdef NNAgent < handle
         % Returns trained neural network.
 
             % flatten states for input to neural network
-            x = b.prestates(:,:);
-            xx = b.poststates(:,:);
+            x = this.preprocess(b.prestates(:,:));
+            xx = this.preprocess(b.poststates(:,:));
 
             % predict Q-values of prestates
             this.nnet.testing = 1;
