@@ -5,22 +5,23 @@ rng('shuffle');
 addpath(genpath('DeepLearnToolbox'));
 
 % How many games to play
-n = 100;
+n = 1000;
 % Number of groups for averaging
 k = 10;
 
-% Creates new agent with 
-%  - exploration rate 0.05, 
-%  - discount rate 0.9, 
-%  - learning rate 0.01, 
-%  - momentum 0, 
-%  - two layers 256 units each,
-%  - no preprocessing
-%  - sigmoidal activation function
-%  - no dropout
-%  - no weight decay
-%  - minibatch size 32.
-a = NNAgent(0.05, 0.9, 0.01, 0, [256 256], @(x) x, 'sigm', 0, 0, 32);
+% Creates new agent with following parameters:
+opts.exploration_steps = 0;
+opts.exploration_rate = 0.05;
+opts.discount_rate = 0;
+opts.learning_rate = 0.001; 
+opts.momentum = 0.95; 
+opts.layers = [1000];
+opts.preprocess = @(x) log2(max(x, 1));
+opts.activation_function = 'relu';
+opts.dropout_fraction = 0;
+opts.weight_penalty = 0;
+opts.minibatch_size = 100;
+a = NNAgent(opts);
 % Plays n games
 results_nn = a.play(n);
 
@@ -28,7 +29,18 @@ results_nn = a.play(n);
 b = RandomAgent();
 results_random = b.play(n);
 
+c = GreedyAgent();
+results_greedy = c.play(n);
+
+d = CornerAgent();
+results_corner = d.play(n);
+
 % Plot results.
+figure;
+results = reshape([results_nn; results_greedy; results_corner; results_random], 4, k, n/k);
+errorbar(mean(results, 3)', std(results, 0, 3)');
+legend('NNAgent', 'GreedyAgent', 'CornerAgent', 'RandomAgent');
+
 figure;
 results = reshape([results_nn; results_random], 2, k, n/k);
 errorbar(mean(results, 3)', std(results, 0, 3)');

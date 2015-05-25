@@ -6,6 +6,7 @@ classdef Memory < handle
         actions;
         rewards;
         poststates;
+        terminals;
     end
     
     methods
@@ -15,8 +16,8 @@ classdef Memory < handle
         %  limit - memory maximum size
         %  dims - dimensions of states, e.g. [4 4]
         % Returns memory object.
-        % Memory is kept as four matrices: prestates, actions, rewards and
-        % poststates.
+        % Memory is kept as five matrices: prestates, actions, rewards,
+        % poststates and terminals.
 
             this.size = 0;
             this.limit = limit;
@@ -24,9 +25,10 @@ classdef Memory < handle
             this.actions = zeros(limit, 1);
             this.rewards = zeros(limit, 1);
             this.poststates = zeros([limit dims]);
+            this.terminals = zeros(limit, 1);
         end
 
-        function add(this, prestate, action, reward, poststate)
+        function add(this, prestate, action, reward, poststate, terminal)
         % ADD Add one state transition to memory.
         % Parameters:
         %  m - memory object
@@ -34,6 +36,7 @@ classdef Memory < handle
         %  action - action taken in this state
         %  reward - observerd reward
         %  poststate - state after the action
+        %  terminal - if poststate is terminal state (game over)
         % Returns new memory object.
 
             % roll over to first if over limit
@@ -44,6 +47,7 @@ classdef Memory < handle
             this.actions(index) = action;
             this.rewards(index) = reward;
             this.poststates(index, :, :) = poststate;
+            this.terminals(index) = terminal;
         end
 
         function batch = minibatch(this, minibatch_size)
@@ -61,6 +65,7 @@ classdef Memory < handle
             batch.actions = this.actions(indexes);
             batch.rewards = this.rewards(indexes);
             batch.poststates = this.poststates(indexes, :, :);
+            batch.terminals = this.terminals(indexes);
         end
     end
 end

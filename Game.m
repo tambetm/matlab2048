@@ -1,4 +1,4 @@
-classdef Game < handle
+classdef Game < matlab.mixin.Copyable
     %GAME Implements 2048 game functions.
     
     properties
