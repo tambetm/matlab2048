@@ -2,14 +2,14 @@
 
 An agent playing game [2048](http://gabrielecirulli.github.io/2048/) using deep Q-learning in Matlab.
 
+**NB!** I never got this code to learn too well, improvements are welcome!
+
 How to download the code:
 ```
-git clone git@github.com:tambetm/matlab2048.git
-cd matlab2048
-git submodule init
-git submodule update
+git--recursive clone https://github.com/tambetm/matlab2048.git
 ```
-Last two lines are required to download [DeepLearnToolbox](https://github.com/rasmusbergpalm/DeepLearnToolbox). (Broken at the moment. Use `git clone git@github.com:rasmusbergpalm/DeepLearnToolbox.git` until I figure it out.)
+
+The code uses my fork of [DeepLearnToolbox](https://github.com/rasmusbergpalm/DeepLearnToolbox) to implement neural network.
 
 How to run it:
 ```
@@ -24,14 +24,19 @@ n = 100;
 % Number of groups for averaging
 k = 10;
 
-% Creates new agent with 
-%  - exploration rate 0.05, 
-%  - discount rate 0.9, 
-%  - learning rate 0.01, 
-%  - momentum 0, 
-%  - two layers 256 units each,
-%  - minibatch size 32.
-a = NNAgent(0.05, 0.9, 0.01, 0, [256 256], 32);
+% Creates new agent with following parameters:
+opts.exploration_steps = 0;
+opts.exploration_rate = 0.05;
+opts.discount_rate = 0;
+opts.learning_rate = 0.001; 
+opts.momentum = 0.95; 
+opts.layers = [1000];
+opts.preprocess = @(x) log2(max(x, 1));
+opts.activation_function = 'relu';
+opts.dropout_fraction = 0;
+opts.weight_penalty = 0;
+opts.minibatch_size = 100;
+a = NNAgent(opts);
 % Plays n games
 results_nn = a.play(n);
 
